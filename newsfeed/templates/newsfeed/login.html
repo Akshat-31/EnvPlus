@@ -1,12 +1,47 @@
-{% extends 'newsfeed/base.html' %}
-{% block title %}Login{% endblock %}
+{% extends "newsfeed/base.html" %}
+{% load static %}
+
+{% block title %}Login - News Feed{% endblock title %}
+
+{# HEADER REMOVAL FIX: Header/Navbar hide karne ke liye is block ko khaali chhod dein #}
+{% block header_content %}{% endblock header_content %}
+
 {% block content %}
-<div class="card form-card">
-<h2>Login to Account</h2>
-<form method="POST">
-{% csrf_token %}
-{{ form.as_p }}
-<button class="btn">Login in</button>
-</form>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Welcome Back!</h2>
+        <p class="auth-subtitle">Log in to view personalized content.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="error-message">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <button type="submit" class="btn-submit">Login</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{% url 'forgot_password' %}" class="link-forgot">Forgot Password?</a>
+            <p>Don't have an account? <a href="{% url 'signup' %}" class="link-signup">Sign Up</a></p>
+        </div>
+    </div>
 </div>
-{% endblock %}
+
+{% endblock content %}

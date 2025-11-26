@@ -1,15 +1,116 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>{% block title %}News App{% endblock %}</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}News Feed Website{% endblock title %}</title>
+
+    <!-- CSS link: 'css/style.css' -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
-<main class="container">
-{% block content %}{% endblock %}
-</main>
+    {# Login aur Signup pages par Header/Sidebar hide karne ke liye empty block #}
+    {% block header_content %}
 
+    <!-- LEFT SIDEBAR / MAIN NAVIGATION -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h1>NEWS</h1>
+        </div>
+
+        <nav class="sidebar-menu">
+            <h4>MAIN MENU</h4>
+            <ul>
+                <li><a href="{% url 'home' %}" {% if request.path == '/news/home/' %}class="active"{% endif %}>Home</a></li>
+                <li><a href="#">Categories</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-user-footer">
+
+            <div class="dark-mode-toggle">
+                <p>Dark Mode</p>
+                <label class="switch">
+                  <input type="checkbox" id="dark-mode-input">
+                  <span class="slider round"></span>
+                </label>
+            </div>
+
+            {% if user.is_authenticated %}
+                <div class="user-info-box">
+                    <p class="user-welcome-text">Welcome, {{ user.username }}!</p>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    Logout
+                </a>
+            {% else %}
+                 <a href="{% url 'login' %}" class="logout-btn">
+                    Login / Signup
+                </a>
+            {% endif %}
+        </div>
+
+    </aside>
+    {% endblock header_content %}
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="content-area">
+        {# Flash messages for login/logout/signup success/failure #}
+        {% if messages %}
+            <ul class="messages-container">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="main-page-content">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </main>
+
+    <!-- FOOTER (Simple bottom bar) -->
+    <footer id="main-footer">
+        <p>&copy; 2025 News Feed. All rights reserved.</p>
+    </footer>
+
+    <!-- Global JS -->
+    <script src="{% static 'js/script.js' %}"></script>
+
+    <!-- Specific JS for child templates -->
+    {% block extra_js %}
+    {% endblock extra_js %}
+
+    <script>
+        // Simple client-side dark mode persistence (for demonstration)
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeInput = document.getElementById('dark-mode-input');
+            const isDark = localStorage.getItem('theme') === 'dark';
+
+            if (isDark) {
+                document.body.classList.add('dark-theme');
+                if(darkModeInput) darkModeInput.checked = true;
+            }
+
+            if (darkModeInput) {
+                darkModeInput.addEventListener('change', () => {
+                    if (darkModeInput.checked) {
+                        document.body.classList.add('dark-theme');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-theme');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

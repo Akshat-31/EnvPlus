@@ -1,0 +1,109 @@
+{% extends "newsfeed/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="article-detail-container">
+
+    <header class="article-header">
+        <h1 class="article-title">{{ article.title }}</h1>
+
+        <div class="article-meta">
+            <span class="author">By **{{ article.authorName }}**</span>
+            <span class="separator">|</span>
+            <span class="read-time">Read Time: {{ article.read_time }} mins</span>
+            <span class="separator">|</span>
+            <span class="views">Views: {{ article.views }}</span>
+        </div>
+    </header>
+
+    <figure class="article-image-figure">
+        {# Image check for safety #}
+        {% if article.image %}
+            <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-main-image">
+        {% else %}
+            <div style="height: 450px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 1.5em; border-radius: 8px;">
+                Image Not Available
+            </div>
+        {% endif %}
+    </figure>
+
+    <div class="content-and-sidebar">
+
+        <section class="article-body">
+            <p class="article-description">{{ article.description }}</p>
+
+            <div class="article-full-content">
+                {{ article.content|safe }}
+            </div>
+
+            <hr>
+
+            <div class="article-actions">
+                {% if user.is_authenticated %}
+                    <button
+                        class="action-btn like-btn {% if is_liked %}liked{% endif %}"
+                        data-article-id="{{ article.id }}"
+                        data-action="like">
+                        <span class="icon">❤️</span>
+                        <span id="like-count-{{ article.id }}">{{ article.like_count }}</span>
+                    </button>
+
+                    <button
+                        class="action-btn save-btn {% if is_saved %}saved{% endif %}"
+                        data-article-id="{{ article.id }}"
+                        data-action="save">
+                        <span class="icon">🔖</span>
+                        Save
+                    </button>
+                {% else %}
+                    <p style="color: #666; font-size: 0.9em;">Please log in to interact.</p>
+                {% endif %}
+
+                <button class="action-btn share-btn">
+                    <span class="icon">🔗</span>
+                    Share
+                </button>
+            </div>
+
+            <hr>
+
+            <div class="comments-section">
+                <h2>Comments ({{ article.comment_count }})</h2>
+
+                {% if user.is_authenticated %}
+                <div class="comment-form-container">
+                    <textarea id="comment-text" placeholder="Write your comment here..."></textarea>
+                    <button id="post-comment-btn" data-article-id="{{ article.id }}" class="btn-primary">Post Comment</button>
+                </div>
+                {% else %}
+                <p class="login-prompt">Please <a href="{% url 'login' %}">log in</a> to post a comment.</p>
+                {% endif %}
+
+                <div id="comments-list">
+                    <p class="loading-comments">Loading comments...</p>
+                    {# Comments will be dynamically loaded by article_detail_script.js #}
+                </div>
+            </div>
+
+        </section>
+
+        <aside class="related-articles">
+            <h3>More in this Category</h3>
+            <ul>
+                <li><a href="#">Related Article Title 1</a></li>
+                <li><li><a href="#">Related Article Title 2</a></li></li>
+                <li><a href="#">Related Article Title 3</a></li>
+            </ul>
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock content %}
+
+{% block extra_js %}
+{# Linking the dedicated JavaScript file for interactivity #}
+<script src="{% static 'js/article_detail_script.js' %}"></script>
+{% endblock extra_js %}
