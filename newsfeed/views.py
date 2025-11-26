@@ -19,15 +19,22 @@ from rest_framework.permissions import AllowAny
 # Create your views here.
 
 def signup_view(request):
-    form = SignupForm(request.POST)
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == "POST":
-        try:
-            print("I AMA HEER")
-            User.objects.get(username=request.user)
-        except User.DoesNotExist:
-            if form.is_valid():
-                form.save()
-        return redirect('login')
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.security_question = form.cleaned_data['security_question']
+            user.set_security_answer(form.cleaned_data['security_answer'])
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SignupForm()
     return render(request, "newsfeed/signup.html", {"form": form})
 
 def login_view(request):
@@ -36,11 +43,15 @@ def login_view(request):
     
     if request.method == 'POST':
         form = LoginForm(request.POST)
+        print("POST DATA:", request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
+            print("User is ::",user)
+            print("password is ::",password)
             if user:
+                print("I AMA HEER")
                 login(request, user)
                 user.last_login_count += 1
                 user.save()
@@ -48,7 +59,8 @@ def login_view(request):
                 response = redirect('home')
                 response.set_cookie('last_visit', user.last_login.isoformat())
                 return response
-            return redirect('signup')
+            else:
+                return redirect('signup')
     else:
         form = LoginForm()
     
@@ -70,17 +82,14 @@ def forgot_password_view(request):
                 try:
                     user = User.objects.get(email=value)
                 except User.DoesNotExist:
-                    return render(request, "/forgot_password.html", {
-                        "form": form,
-                        "error": "User not found."
-                    })
+                    return render(request, "newsfeed/forgot_password.html", {"form": form,"error": "User not found."})
 
             return redirect("answer_security_question", user_id=user.id)
 
     else:
         form = SecurityQuestionForm()
 
-    return render(request, "accounts/forgot_password.html", {"form": form})
+    return render(request, "newsfeed/forgot_password.html", {"form": form})
 
 def answer_security_question(request, user_id):
     user = User.objects.get(id=user_id)
@@ -91,17 +100,19 @@ def answer_security_question(request, user_id):
             if user.check_security_answer(form.cleaned_data["answer"]):
                 return redirect("reset_password_security", user_id=user.id)
             else:
-                return render(request, "accounts/answer_security_question.html", {
+                return render(request, "newsfeed/answer_security_question.html", {
                     "form": form,
-                    "question": user.get_security_question_display(),
-                    "error": "Incorrect answer."
+                    "question": user.security_question,
+                    "error": "Incorrect answer.",
+                    "user_id":user.id
                 })
     else:
         form = AnswerSecurityQuestionForm()
 
-    return render(request, "accounts/answer_security_question.html", {
+    return render(request, "newsfeed/answer_security_question.html", {
         "form": form,
-        "question": user.get_security_question_display(),
+        "question": user.security_question,
+        "user_id":user.id
     })
 
 def reset_password_security(request, user_id):
@@ -112,11 +123,13 @@ def reset_password_security(request, user_id):
         if form.is_valid():
             user.set_password(form.cleaned_data["new_password1"])
             user.save()
-            return render(request, "accounts/reset_password_success.html")
+            form=LoginForm()
+            return redirect("login")
+            # return render(request, "newsfeed/login.html",{"form":form})
     else:
         form = ResetPasswordForm()
 
-    return render(request, "accounts/reset_password_security.html", {"form": form})
+    return render(request, "newsfeed/reset_password_security.html", {"form": form,"user_id":user.id})
 
 
 class HomeView(APIView):
@@ -146,7 +159,8 @@ class HomeView(APIView):
             'userCommeted':CommentSerializer(userCommeted,many=True).data,
             'userHistory':ReadHistorySerializer(userHistory, many=True).data
         }
-        return Response(response)
+        # return Response(response)
+        return render(request, 'newsfeed/home.html', response)
 
 class IndividualArticleDetailView(APIView):
 
@@ -161,21 +175,27 @@ class IndividualArticleDetailView(APIView):
                 user_commented_article=Comment.objects.filter(article__id=article_id)
                 response["article_like_detail"]=LikeSerializer(user_liked_article,many=True).data
                 response["article_comment_detail"]=CommentSerializer(user_commented_article,many=True).data
-            return Response(response)
+            # return Response(response)
+            return render(request, 'newsfeed/articledetail.html', response)
+        
         except Article.DoesNotExist:
-            return Response({"message":"Article Doesnot Exist"})
+            # return Response({"message":"Article Doesnot Exist"})
+            return redirect('home')
         
 class FilterArticleDetailView(APIView):
 
     def get(self, request, category_id):
         try:
+            
             article= Article.objects.filter(category__id=category_id)
             response={
-                'filtered_article':ArticleSerializer(article).data
+                'articles':ArticleSerializer(article,many=True).data
             }
-            return Response(response)
+            # return Response(response)
+            return render(request, 'newsfeed/home.html', response)
         except Article.DoesNotExist:
-            return Response({"message":"Article Doesnot Exist"})
+            # return Response({"message":"Article Doesnot Exist"})
+            return redirect('home')
 
 class UserProfile(APIView):
 
@@ -195,7 +215,8 @@ class UserProfile(APIView):
             'userReadHistory':ReadHistorySerializer(userReadHistory, many=True).data,
             'userLoginHistory':LoginHistorySerializer(userLoginHistory, many=True).data
         }
-        return Response(response)
+        # return Response(response)
+        return render(request, 'newsfeed/profile.html', response)
 
 class LikeArticle(APIView):
 
@@ -204,7 +225,8 @@ class LikeArticle(APIView):
         
         like_records=Like.objects.filter(user=user, article__id=article_id)
         if like_records:
-            return Response({"messgae":"This article is already liked"})
+            # return Response({"messgae":"This article is already liked"})
+            return redirect(request.META.get('HTTP_REFERER', 'article_detail', kwargs={'article_id': article.id}))
         else:
             article=Article.objects.get(id=article_id)
             Like.objects.create(user=user, article=article)
@@ -219,14 +241,17 @@ class CommentArticle(APIView):
             
             like_records=Comment.objects.filter(user=user, article__id=article_id)
             if like_records:
-                return Response({"messgae":"This article is already commented"})
+                # return Response({"messgae":"This article is already commented"})
+                return redirect('article_detail', article_id=article.id)
             else:
                 article=Article.objects.get(id=article_id)
                 Comment.objects.create(user=user, article=article, content=request.data.get("content"))
-                return Response({"message":"Article is Commented"})
+                # r
+                # return redirect('article_detail', article_id=article.id)eturn Response({"message":"Article is Commented"})
         except Exception as e:
             print("Exception as::",e)
-            return Response({"message":"Error"})
+            # return Response({"message":"Error"})
+            return redirect('home')
 
 class SaveArticle(APIView):
 
@@ -237,14 +262,17 @@ class SaveArticle(APIView):
             
             like_records=SavedArticle.objects.filter(user=user, article__id=article_id)
             if like_records:
-                return Response({"messgae":"This article is already saved"})
+                # return Response({"messgae":"This article is already saved"})
+                return redirect('home')
             else:
                 article=Article.objects.get(id=article_id)
                 SavedArticle.objects.create(user=user, article=article)
-                return Response({"message":"Article is Saved"})
+                # return Response({"message":"Article is Saved"})
+                return redirect(request.META.get('HTTP_REFERER', 'article_detail', kwargs={'article_id': article.id}))
         except Exception as e:
             print("Exception as::",e)
-            return Response({"message":"Error"})
+            # return Response({"message":"Error"})
+            return redirect('home')
 
 class CreateArticle(APIView):
 
@@ -260,7 +288,8 @@ class CreateArticle(APIView):
             if category:
                 category = get_object_or_404(Category, id=category)
             Article.objects.create(title=article_title,description=description,content=content,read_time=read_time,author=request.user, category=category,image=image)
-            return Response({"message":"Article created"})
+            return redirect("home/")
+            # return Response({"message":"Article created"})
         except Exception as e:
             print("Exception as ::",e)
             return Response({"message":"ERROR"})
@@ -311,36 +340,8 @@ class CreateArticle(APIView):
         except Exception as e:
             print("Exception as ::",e)
             return Response({"message":"ERROR"})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
-
-
-
-
-
-
-
-
-
-
-
+    def get(self, request):
+        form = ArticleForm()
+        return render(request, "newsfeed/create_article.html",{"form":form})
 

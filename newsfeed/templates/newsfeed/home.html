@@ -1,0 +1,141 @@
+{% extends 'newsfeed/base.html' %}
+{% load static %}
+
+{% block title %}Home — NewsHub{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Categories</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0">
+                        <a href="{% url 'home' %}"
+                           class="text-decoration-none {% if not current_category %}fw-bold text-primary{% endif %}">
+                            All
+                        </a>
+                    </li>
+
+                    {% for category in categories %}
+                    <li class="list-group-item px-0">
+                        <a href="{% url 'article_detail' category_id=category.id %}"
+                           class="text-decoration-none {% if current_category.id == category.id %}fw-bold text-primary{% endif %}">
+                            {{ category.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="mt-4 p-3 bg-light rounded text-center border">
+                    <h6 class="fw-bold">Advertisement</h6>
+                    <p class="small">Your ad could be here!</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Articles Grid -->
+    <section class="col-md-9">
+
+        <div class="row g-4">
+            {% for article in articles %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 article-card">
+
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" class="card-img-top" style="height:190px; object-fit:cover;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height:190px;">
+                            <i class="fas fa-image fs-1 text-muted"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body">
+
+                        <span class="badge bg-primary mb-2">{{ article.category.name }}</span>
+
+                        <h5 class="card-title">
+                            <a href="{% url 'article_detail' article.id %}" class="text-decoration-none text-dark">
+                                {{ article.title }}
+                            </a>
+                        </h5>
+
+                        <p class="card-text text-muted small">
+                            {{ article.description}}
+                        </p>
+
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span><i class="fas fa-user me-1"></i> {{ article.authorName }}</span>
+                            <span><i class="fas fa-clock me-1"></i> {{ article.read_time }} min</span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                        
+                        <!-- Like -->
+                        <form action="{% url 'like_article' article.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="btn btn-sm {% if article.id in user_liked_articles %}text-danger{% else %}text-muted{% endif %}">
+                                <i class="fas fa-heart"></i> {{ article.like_count }}
+                            </button>
+                        </form>
+
+                        <!-- Comments -->
+                        <a href="{% url 'article_detail' article_id=article.id %}#comments"
+                           class="btn btn-sm text-muted">
+                            <i class="fas fa-comment"></i> {{ article.comment_count }}
+                        </a>
+
+                        <!-- Save -->
+                        <form action="{% url 'save_article' article.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="btn btn-sm {% if article.id in user_saved_articles %}text-primary{% else %}text-muted{% endif %}">
+                                <i class="fas fa-bookmark"></i>
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+            {% empty %}
+                <p>No articles found in this category.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <a class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </a>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

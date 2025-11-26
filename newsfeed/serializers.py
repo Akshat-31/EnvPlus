@@ -31,6 +31,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'authorName',
             'like_count',
             'comment_count',
+            'category'
         ]
     
 class LikeSerializer(serializers.ModelSerializer):

@@ -1,0 +1,87 @@
+{% extends 'newsfeed/base.html' %}
+{% load static %}
+
+{% block title %}User Profile - NewsHub{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-header">
+        <h1>Welcome, {{ user_detail.username }}!</h1>
+        <p class="member-since">Member Since: {{ user_detail.member_since|date:"M d, Y" }}</p>
+        <p class="bio">{{ user_detail.bio|default:"No bio provided yet." }}</p>
+        <p>Email: **{{ user_detail.email }}**</p>
+        {% if user_detail.is_admin %}
+            <span class="role-badge admin">Administrator</span>
+        {% elif user_detail.is_author %}
+            <span class="role-badge author">Author</span>
+        {% endif %}
+    </div>
+
+    <div class="profile-stats">
+        <div class="stat-card">
+            <h4>Total Likes</h4>
+            <p>{{ userLiked|length }}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Total Comments</h4>
+            <p>{{ userCommeted|length }}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Saved Articles</h4>
+            <p>{{ userSaved|length }}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Articles Read</h4>
+            <p>{{ userReadHistory|length }}</p>
+        </div>
+    </div>
+
+    <div class="profile-content-tabs">
+        <input type="radio" name="tab" id="tab1" checked>
+        <label for="tab1">Saved Articles ({{ userSaved|length }})</label>
+
+        <input type="radio" name="tab" id="tab2">
+        <label for="tab2">Read History ({{ userReadHistory|length }})</label>
+
+        <input type="radio" name="tab" id="tab3">
+        <label for="tab3">Login History ({{ userLoginHistory|length }})</label>
+
+        <!-- <div class="tab-content" id="content1">
+            {% if userSaved %}
+                {% for saved in userSaved %}
+                    <a href="{% url 'article_detail' saved.article.id %}" class="list-item">
+                        <i class="fas fa-bookmark"></i> {{ saved.article.title }} (Saved on {{ saved.created_at|date:"M d, Y" }})
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>You have not saved any articles yet.</p>
+            {% endif %}
+        </div> -->
+
+        <!-- <div class="tab-content" id="content2">
+            {% if read_history %}
+                {% for history in read_history %}
+                    <a href="{% url 'article_detail' history.article.id %}" class="list-item">
+                        <i class="fas fa-eye"></i> {{ history.article.title }} (Read at {{ history.read_at|date:"M d, Y H:i" }})
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>No reading history found.</p>
+            {% endif %}
+        </div> -->
+
+        <div class="tab-content" id="content3">
+            {% if login_history %}
+                <ul class="login-history-list">
+                {% for login in login_history|slice:":10" %}
+                    <li><i class="fas fa-sign-in-alt"></i> Logged in at {{ login.logged_in_at|date:"M d, Y H:i" }}</li>
+                {% endfor %}
+                </ul>
+                <p>Showing last 10 logins.</p>
+            {% else %}
+                <p>No login history recorded.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

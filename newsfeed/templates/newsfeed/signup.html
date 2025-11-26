@@ -1,12 +1,95 @@
 {% extends 'newsfeed/base.html' %}
-{% block title %}Signup{% endblock %}
+{% load static %}
+
+{% block title %}Sign Up - NewsHub{% endblock %}
+
 {% block content %}
-<div class="card form-card">
-<h2>Create Account</h2>
-<form method="POST">
-{% csrf_token %}
-{{ form.as_p }}
-<button class="btn">Sign Up</button>
-</form>
+<div class="auth-container">
+    <h2>Sign Up</h2>
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        <!-- Username -->
+        <div class="form-group">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+                <ul class="errorlist">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.errors %}
+                <ul class="errorlist">
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+            {{ form.confirm_password.label_tag }}
+            {{ form.confirm_password }}
+            {% if form.confirm_password.errors %}
+                <ul class="errorlist">
+                    {% for error in form.confirm_password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Security Question -->
+        <div class="form-group">
+            {{ form.security_question.label_tag }}
+            {{ form.security_question }}
+            {% if form.security_question.errors %}
+                <ul class="errorlist">
+                    {% for error in form.security_question.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Security Answer -->
+        <div class="form-group">
+            {{ form.security_answer.label_tag }}
+            {{ form.security_answer }}
+            {% if form.security_answer.errors %}
+                <ul class="errorlist">
+                    {% for error in form.security_answer.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="button primary">Sign Up</button>
+    </form>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
 </div>
 {% endblock %}

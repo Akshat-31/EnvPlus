@@ -1,0 +1,84 @@
+{% extends 'newsfeed/base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - NewsHub{% endblock %}
+
+{% block content %}
+<div class="article-detail-page">
+    <article class="full-article">
+        {% if article_detail.image %}
+            <img src="{{ article_detail.image.url }}" alt="{{ article.title }}" class="article-hero-image">
+        {% else %}
+            <div class="placeholder-hero-image"><i class="fas fa-image"></i></div>
+        {% endif %}
+
+        <h1 class="article-title">{{ article_detail.title }}</h1>
+        <div class="article-meta">
+            <span class="category-tag">{{ article_detail.category.name }}</span>
+            <span class="author"><i class="fas fa-user"></i> {{ article_detail.author.username }}</span>
+            <span class="date"><i class="fas fa-calendar-alt"></i> {{ article_detail.created_at|date:"M d, Y" }}</span>
+            <span class="read-time"><i class="fas fa-clock"></i> {{ article_detail.read_time }} min read</span>
+            <span class="views"><i class="fas fa-eye"></i> {{ article_detail.views }} views</span>
+        </div>
+
+        <div class="article-actions-detail">
+            <form action="{% url 'like_article' article_detail.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="action-button {% if is_liked %}liked{% endif %}">
+                    <i class="fas fa-heart"></i> {{ article_detail.like_count }}
+                </button>
+            </form>
+            <a href="#comments" class="action-button">
+                <i class="fas fa-comment"></i> {{ article_detail.comment_count }}
+            </a>
+            <form action="{% url 'save_article' article_detail.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="action-button {% if is_saved %}saved{% endif %}">
+                    <i class="fas fa-bookmark"></i> {% if is_saved %}Unsave{% else %}Save{% endif %}
+                </button>
+            </form>
+            <button class="action-button"><i class="fas fa-share-alt"></i> Share</button>
+        </div>
+
+        <div class="article-content">
+            <p class="description">{{ article_detail.description }}</p>
+            <hr>
+            {{ article_detail.content|linebreaks }}
+        </div>
+    </article>
+
+    <section id="comments" class="comments-section">
+        <h2>Comments ({{ article_detail.comment_count }})</h2>
+        {% if user.is_authenticated %}
+            <div class="comment-form-container">
+                <h3>Leave a Comment</h3>
+                <form action="{% url 'save_article' article_detail.id %}" method="post" class="comment-form">
+                    {% csrf_token %}
+                    {% for field in article_comment_detail %}
+                        <div class="form-group">
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="button primary">Submit Comment</button>
+                </form>
+            </div>
+        {% else %}
+            <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+        {% endif %}
+
+        <div class="comment-list">
+            {% for comment in article_comment_detail %}
+            <div class="comment-item">
+                <div class="comment-meta">
+                    <strong>{{ article_comment_detail.user.username }}</strong>
+                    <span class="comment-date">{{ article_comment_detail.created_at|date:"M d, Y H:i" }}</span>
+                </div>
+                <p>{{ article_comment_detail.content }}</p>
+            </div>
+            {% empty %}
+                <p>No comments yet. Be the first to comment!</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

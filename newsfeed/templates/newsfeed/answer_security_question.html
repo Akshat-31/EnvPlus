@@ -1,0 +1,27 @@
+{% extends 'newsfeed/base.html' %}
+{% load static %}
+
+{% block title %}Security Question - NewsHub{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Security Question</h2>
+    <p>Please answer your security question to reset your password.</p>
+    <form method="post" class="auth-form" action="{% url 'answer_security_question' user_id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>{{ question }}</label>
+            {{ form.answer }}
+            {% if form.answer.errors %}
+                <ul class="errorlist">
+                    {% for error in form.answer.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <button type="submit" class="button primary">Submit Answer</button>
+    </form>
+    <p><a href="{% url 'forgot_password' %}">Back to Forgot Password</a></p>
+</div>
+{% endblock %}

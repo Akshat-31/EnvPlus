@@ -18,7 +18,7 @@ urlpatterns = [
     path('profile/', views.UserProfile.as_view(), name='profile'),
     
     path('like/<int:article_id>/', views.LikeArticle.as_view(), name='like_article'),
-    path('comment/<int:article_id>/', views.CommentArticle.as_view(), name='save_article'),
+    path('comment/<int:article_id>/', views.CommentArticle.as_view(), name='comment_article'),
     path('save/<int:article_id>/', views.SaveArticle.as_view(), name='save_article'),
     
     path('admin/article/crud/', views.CreateArticle.as_view(), name='create_article'),

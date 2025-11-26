@@ -1,9 +1,11 @@
 from django import forms
-from newsfeed.models import User
+from newsfeed.models import Article, Category, User
 
 class SignupForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
+    security_question = forms.ChoiceField(choices=User.SECURITY_QUESTIONS,widget=forms.Select(attrs={"class": "input"}))
+    security_answer = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
     class Meta:
         model = User
         fields = ["username", "email", "password"]
@@ -16,6 +18,8 @@ class SignupForm(forms.ModelForm):
         cleaned = super().clean()
         if cleaned.get("password") != cleaned.get("confirm_password"):
             self.add_error("confirm_password", "Passwords do not match")
+        if not cleaned.get("security_answer"):
+            self.add_error("security_answer", "Please provide an answer")
         return cleaned
 
 class LoginForm(forms.Form):
@@ -40,3 +44,23 @@ class ResetPasswordForm(forms.Form):
             raise forms.ValidationError("Passwords do not match.")
         return cleaned
 
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title', 'description', 'content', 'category', 'image', 'read_time']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'input', 'placeholder': 'Article Title'}),
+            'description': forms.Textarea(attrs={'class': 'textarea', 'placeholder': 'Brief description'}),
+            'content': forms.Textarea(attrs={'class': 'textarea', 'placeholder': 'Full article content'}),
+            'category': forms.Select(attrs={'class': 'select'}),
+            'read_time': forms.NumberInput(attrs={'class': 'input', 'placeholder': 'Estimated read time in minutes'}),
+        }
+        labels = {
+            'read_time': 'Read Time (minutes)',
+        }
+
+    # Add a custom __init__ to set initial category choices
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.all().order_by('name')
+        self.fields['category'].empty_label = "Select Category" # Optional: Add an empty choice
