@@ -1,0 +1,99 @@
+{% extends "newsfeed/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-layout-container">
+
+    <aside class="sidebar">
+        <h3>Categories</h3>
+        <ul>
+            {% for category in categories %}
+                <li>
+                    <a href="{% url 'filter_article' category.id %}">{{ category.name }}</a>
+                </li>
+            {% empty %}
+                <li>No Categories found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3 style="margin-top: 20px;">Trending</h3>
+        <ul>
+            <li><a href="#">Top Trend Article 1</a></li>
+            <li><a href="#">Top Trend Article 2</a></li>
+            <li><a href="#">Top Trend Article 3</a></li>
+        </ul>
+    </aside>
+
+    <section class="feed-content">
+
+        {% if articles %}
+            {% with hero_article=articles.0 %}
+
+                {# HERO SECTION: Image check for safety #}
+                {% if hero_article.image %}
+                    <div class="hero-article">
+                        <img src="{{ hero_article.image.url }}" alt="{{ hero_article.title }}">
+                        <div class="hero-info">
+                            <h2><a href="{% url 'article_detail' hero_article.id %}">{{ hero_article.title }}</a></h2>
+                            <p>{{ hero_article.description|truncatechars:150 }}</p>
+                            <span class="meta-info">
+                                By **{{ hero_article.authorName }}** |
+                                Views: {{ hero_article.views }} |
+                                Read Time: {{ hero_article.read_time }} mins
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    {# Fallback if image is missing #}
+                    <div class="hero-article-no-image" style="background-color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 40px;">
+                        <h2><a href="{% url 'article_detail' hero_article.id %}">{{ hero_article.title }}</a></h2>
+                        <p class="article-description">{{ hero_article.description|truncatechars:300 }}</p>
+                        <span class="meta-info">**Image Missing, showing text only.**</span>
+                    </div>
+                {% endif %}
+
+            {% endwith %}
+        {% endif %}
+
+        <h2 style="margin-top: 40px;">Latest Articles</h2>
+        <div class="article-grid">
+            {% for article in articles %}
+
+                {# **FIXED:** Pehla article (index 0) skip karo agar list mein ek se zyada articles hain #}
+                {% if forloop.counter0 == 0 and articles|length > 1 %}
+                    {# Skip rendering this block, as it is the hero article #}
+                {% else %}
+
+                    <article class="news-card">
+
+                        {# ARTICLE CARD IMAGE CHECK #}
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                        {% else %}
+                            <div style="height: 200px; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #666; font-size: 0.9em;">
+                                NO IMAGE
+                            </div>
+                        {% endif %}
+
+                        <div class="card-content">
+                            <h4><a href="{% url 'article_detail' article.id %}">{{ article.title|truncatechars:50 }}</a></h4>
+                            <p class="description">{{ article.description|truncatechars:100 }}</p>
+                            <div class="stats">
+                                <span>❤️ {{ article.like_count }}</span>
+                                <span>💬 {{ article.comment_count }}</span>
+                            </div>
+                        </div>
+                    </article>
+
+                {% endif %}
+            {% empty %}
+                <p>No articles found yet.</p>
+            {% endfor %}
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock content %}
