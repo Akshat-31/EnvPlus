@@ -130,6 +130,10 @@ a:hover {
     text-decoration: none;
     opacity: 0.8;
 }
+.navbar-brand, 
+.navbar-nav .nav-link {
+    color: #000 !important;
+}
 
 /* --- Messages (Alerts) --- */
 .messages {

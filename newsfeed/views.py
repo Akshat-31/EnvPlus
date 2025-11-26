@@ -215,6 +215,7 @@ class UserProfile(APIView):
             'userReadHistory':ReadHistorySerializer(userReadHistory, many=True).data,
             'userLoginHistory':LoginHistorySerializer(userLoginHistory, many=True).data
         }
+        print("Te",ArticleSavedSerializer(userSaved,many=True).data)
         # return Response(response)
         return render(request, 'newsfeed/profile.html', response)
 
@@ -226,11 +227,14 @@ class LikeArticle(APIView):
         like_records=Like.objects.filter(user=user, article__id=article_id)
         if like_records:
             # return Response({"messgae":"This article is already liked"})
-            return redirect(request.META.get('HTTP_REFERER', 'article_detail', kwargs={'article_id': article.id}))
+            # return redirect(request.META.get('HTTP_REFERER', 'article_detail', kwargs={'article_id': article.id}))
+            return redirect('home')
         else:
             article=Article.objects.get(id=article_id)
-            Like.objects.create(user=user, article=article)
-            return Response({"message":"Article is liked"})
+            l=Like.objects.create(user=user, article=article)
+            l.save()
+            # return Response({"message":"Article is liked"})
+            return redirect('home')
 
 class CommentArticle(APIView):
 
