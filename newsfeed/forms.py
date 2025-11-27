@@ -55,10 +55,4 @@ class ArticleForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'select'}),
             'read_time': forms.NumberInput(attrs={'class': 'input', 'placeholder': 'Estimated read time in minutes'}),
         }
-        labels = {
-            'read_time': 'Read Time (minutes)',
-        }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = Category.objects.all().order_by('name')
-        self.fields['category'].empty_label = "Select Category"
+   
