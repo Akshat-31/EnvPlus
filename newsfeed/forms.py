@@ -61,4 +61,4 @@ class ArticleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.all().order_by('name')
-        self.fields['category'].empty_label = "Select Category" # Optional: Add an empty choice
+        self.fields['category'].empty_label = "Select Category"
