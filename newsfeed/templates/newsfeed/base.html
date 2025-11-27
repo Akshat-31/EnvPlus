@@ -4,43 +4,40 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}NewsHub{% endblock %}</title>
+    <title>{% block title %}EnvPlus{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome -->
+    <!-- Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 
 <body class="bg-light">
-
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">NewsHub</a>
+            <a class="navbar-brand fw-bold fs-3 text-primary" href="{% url 'home' %}">EnvPlus</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navMenu">
-                <form class="d-flex ms-auto me-3">
-                    <input class="form-control rounded-pill px-3" type="search" placeholder="Search news...">
+                <form class="d-flex ms-auto me-3" method="GET" action="{% url 'search_news' %}">
+                    <input name="query" class="form-control rounded-pill px-3" type="search" placeholder="Search news...">
                 </form>
 
                 <ul class="navbar-nav mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
                         {% if user.can_manage_articles %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'create_article' %}">Create Article</a>
+                            <li class="nav-item ">
+                                <a class="nav-link text-dark" href="{% url 'create_article' %}">Create Article</a>
                             </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">
+                            <a class="nav-link text-dark" href="{% url 'profile' %}">
                                 <i class="fas fa-user me-1"></i> {{ user.username }}
                             </a>
                         </li>
@@ -69,12 +66,12 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
+    <!-- Footer Section -->
     <footer class="bg-dark text-light pt-5 pb-4 mt-5">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-md-3">
-                    <h4>About NewsHub</h4>
+                    <h4>About EnvPlus</h4>
                     <p>Your trusted source for breaking news and analysis.</p>
                 </div>
 
@@ -82,17 +79,16 @@
                     <h4>Quick Links</h4>
                     <ul class="list-unstyled">
                         <li><a class="footer-link" href="#">Home</a></li>
-                        <li><a class="footer-link" href="https://www.linkedin.com/in/akshat-sehgal-518x/">About Us</a></li>
-                        <li><a class="footer-link" href="https://www.linkedin.com/in/akshat-sehgal-518x/">Contact</a></li>https://www.linkedin.com/in/akshat-sehgal-518x/
+                        <li><a class="footer-link" href="https://www.uwindsor.ca" target="_blank" >About Us</a></li>
+                        <li><a class="footer-link" href="https://www.uwindsor.ca" target="_blank" >Contact</a></li>
                     </ul>
                 </div>
 
                 <div class="col-md-3">
                     <h4>Legal</h4>
                     <ul class="list-unstyled">
-                        <li><a class="footer-link" href="#">Terms</a></li>
-                        <li><a class="footer-link" href="#">Privacy</a></li>
-                        <li><a class="footer-link" href="#">Cookies</a></li>
+                        <li><a class="footer-link" href="https://www.uwindsor.ca" target="_blank" >Terms</a></li>
+                        <li><a class="footer-link" href="https://www.uwindsor.ca" target="_blank" >Privacy</a></li>
                     </ul>
                 </div>
 
@@ -108,7 +104,7 @@
             </div>
 
             <div class="text-center mt-4 small">
-                © 2025 NewsHub — All rights reserved.
+                2025 Env — All rights reserved.
             </div>
         </div>
     </footer>

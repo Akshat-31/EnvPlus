@@ -14,7 +14,8 @@ urlpatterns = [
     
     path('home/', views.HomeView.as_view(), name='home'),
     path('article/<int:article_id>/', views.IndividualArticleDetailView.as_view(), name='article_detail'),
-    path('filter_article/<int:category_id>/', views.FilterArticleDetailView.as_view(), name='article_detail'),
+    path('filter_article/<int:category_id>/', views.FilterArticleDetailView.as_view(), name='filter_detail'),
+    path('filter_news/', views.SearchNewsDetailView.as_view(), name='search_news'),
     path('profile/', views.UserProfile.as_view(), name='profile'),
     
     path('like/<int:article_id>/', views.LikeArticle.as_view(), name='like_article'),

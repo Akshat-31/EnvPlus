@@ -1,7 +1,7 @@
 {% extends 'newsfeed/base.html' %}
 {% load static %}
 
-{% block title %}Home — NewsHub{% endblock %}
+{% block title %}Home — EnvPlus{% endblock %}
 
 {% block content %}
 
@@ -22,18 +22,13 @@
 
                     {% for category in categories %}
                     <li class="list-group-item px-0">
-                        <a href="{% url 'article_detail' category_id=category.id %}"
+                        <a href="{% url 'filter_detail' category_id=category.id %}"
                            class="text-decoration-none {% if current_category.id == category.id %}fw-bold text-primary{% endif %}">
                             {{ category.name }}
                         </a>
                     </li>
                     {% endfor %}
                 </ul>
-
-                <div class="mt-4 p-3 bg-light rounded text-center border">
-                    <h6 class="fw-bold">Advertisement</h6>
-                    <p class="small">Your ad could be here!</p>
-                </div>
             </div>
         </div>
     </aside>
@@ -46,8 +41,8 @@
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-0 article-card">
 
-                    {% if article.image %}
-                        <img src="{{ article.image.url }}" class="card-img-top" style="height:190px; object-fit:cover;">
+                    {% if article.image  %}
+                        <img src="{{ article.image }}" class="card-img-top" style="height:190px; object-fit:cover;">
                     {% else %}
                         <div class="bg-light d-flex align-items-center justify-content-center" style="height:190px;">
                             <i class="fas fa-image fs-1 text-muted"></i>
@@ -108,31 +103,6 @@
                 <p>No articles found in this category.</p>
             {% endfor %}
         </div>
-
-        <!-- Pagination -->
-        {% if is_paginated %}
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    </li>
-                {% endif %}
-
-                <li class="page-item disabled">
-                    <a class="page-link">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                    </a>
-                </li>
-
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
 
     </section>
 

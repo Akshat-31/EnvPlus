@@ -2,9 +2,9 @@ from django import forms
 from newsfeed.models import Article, Category, User
 
 class SignupForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
-    security_question = forms.ChoiceField(choices=User.SECURITY_QUESTIONS,widget=forms.Select(attrs={"class": "input"}))
+    password=forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
+    confirm_password=forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
+    security_question=forms.ChoiceField(choices=User.SECURITY_QUESTIONS,widget=forms.Select(attrs={"class": "input"}))
     security_answer = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
     class Meta:
         model = User
@@ -23,24 +23,24 @@ class SignupForm(forms.ModelForm):
         return cleaned
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
+    username=forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input"}))
     
 class SecurityQuestionForm(forms.Form):
-    username_or_email = forms.CharField(label="Username or Email")
+    username_or_email= forms.CharField(label="Username or Email")
 
 class AnswerSecurityQuestionForm(forms.Form):
     answer = forms.CharField(widget=forms.PasswordInput, label="Your Answer")
 
 class ResetPasswordForm(forms.Form):
-    new_password1 = forms.CharField(widget=forms.PasswordInput)
+    new_password1 =forms.CharField(widget=forms.PasswordInput)
     new_password2 = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self):
         cleaned = super().clean()
-        p1 = cleaned.get("new_password1")
-        p2 = cleaned.get("new_password2")
-        if p1!=p2:
+        password_1 = cleaned.get("new_password1")
+        password_2 = cleaned.get("new_password2")
+        if password_1!=password_2:
             raise forms.ValidationError("Passwords do not match.")
         return cleaned
 
@@ -58,8 +58,6 @@ class ArticleForm(forms.ModelForm):
         labels = {
             'read_time': 'Read Time (minutes)',
         }
-
-    # Add a custom __init__ to set initial category choices
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.all().order_by('name')

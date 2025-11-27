@@ -9,7 +9,6 @@ class TimestampedModel(models.Model):
     class Meta:
         abstract = True
 
-
 class User(AbstractUser):
     SECURITY_QUESTIONS = [
         ("pet", "What is your first pet's name?"),
@@ -17,7 +16,6 @@ class User(AbstractUser):
         ("city", "In what city were you born?"),
         ("nickname", "What was your childhood nickname?"),
     ]
-
     bio = models.TextField(max_length=500, blank=True)
     is_admin = models.BooleanField(default=False)
     is_author = models.BooleanField(default=False)
@@ -34,7 +32,6 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
-    
     def can_manage_articles(self):
         return self.is_admin or self.is_staff or self.is_author
 
@@ -45,7 +42,6 @@ class Category(TimestampedModel):
 
     def __str__(self):
         return self.name
-
 
 class Article(TimestampedModel):
     title = models.CharField(max_length=200)
@@ -90,14 +86,12 @@ class Comment(TimestampedModel):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.article.title}"
 
-
 class SavedArticle(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_articles')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='saved_by')
     
     def __str__(self):
         return f"{self.user.username} saved {self.article.title}"
-
 
 class ReadHistory(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='read_history')
@@ -113,5 +107,3 @@ class LoginHistory(TimestampedModel):
 
     def __str__(self):
         return f"{self.user.username} logged in at {self.logged_in_at}"
-
-    

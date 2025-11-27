@@ -10,6 +10,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     authorName = serializers.CharField(source='author.username',read_only=True)
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source='category.name', read_only=True)
 
     def get_like_count(self, obj):
         return obj.total_likes()
@@ -31,7 +32,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'authorName',
             'like_count',
             'comment_count',
-            'category'
+            'category_name'
         ]
     
 class LikeSerializer(serializers.ModelSerializer):
@@ -42,7 +43,7 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['id', 'article', 'article_title', 'created_at']
 
 class CommentSerializer(serializers.ModelSerializer):
-    article_title = serializers.CharField(source='article.title', read_only=True)
+    article_title= serializers.CharField(source='article.title', read_only=True)
 
     class Meta:
         model = Comment
@@ -52,21 +53,23 @@ class ReadHistorySerializer(serializers.ModelSerializer):
     article_title = serializers.CharField(source='article.title', read_only=True)
 
     class Meta:
-        model = ReadHistory
-        fields = ['id', 'article', 'article_title', 'created_at']
+        model= ReadHistory
+        fields =['id', 'article', 'article_title', 'created_at']
 
 class UserDetailSerializer(serializers.ModelSerializer):
      class Meta:
         model = User
-        fields = ['bio','id','is_admin','is_author','member_since','last_login_count']
+        fields = '__all__'
 
 class LoginHistorySerializer(serializers.ModelSerializer):
      class Meta:
         model = LoginHistory
-        fields = '__all__'
+        fields ='__all__'
 
 
 class ArticleSavedSerializer(serializers.ModelSerializer):
+     category_name = serializers.CharField(source='article.title', read_only=True)
      class Meta:
         model = SavedArticle
-        fields = '__all__'
+        fields= '__all__'
+        extra_fields=['category_name']

@@ -1,13 +1,13 @@
 {% extends 'newsfeed/base.html' %}
 {% load static %}
 
-{% block title %}User Profile - NewsHub{% endblock %}
+{% block title %}User Profile - EnvPlus{% endblock %}
 
 {% block content %}
 <div class="profile-page">
     <div class="profile-header">
         <h1>Welcome, {{ user_detail.username }}!</h1>
-        <p class="member-since">Member Since: {{ user_detail.created_at|date:"M d, Y" }}</p>
+        <p class="member-since">Member Since: {{ user_detail.date_joined }}</p>
         <p class="bio">{{ user_detail.bio|default:"No bio provided yet." }}</p>
         <p>Email: **{{ user_detail.email }}**</p>
         {% if user_detail.is_admin %}
@@ -55,7 +55,7 @@
             {% if userSaved %}
                 <ul class="login-history-list">
                 {% for login in userSaved|slice:":10" %}
-                    <li><i class="fas fa-sign-in-alt"></i> Saved article {{ login.article }}</li>
+                    <li><i class="fas fa-sign-in-alt"></i> Saved article {{ login.category_name }}</li>
                 {% endfor %}
                 </ul>
                 <p>Showing Saved articles id.</p>

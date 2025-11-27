@@ -1,12 +1,18 @@
 {% extends 'newsfeed/base.html' %}
 {% load static %}
 
-{% block title %}Create New Article - NewsHub{% endblock %}
+{% block title %}Create New Article - EnvPlus{% endblock %}
 
 {% block content %}
 <div class="form-container wide-form">
-    <h2>Create New Article</h2>
-    <form method="post" enctype="multipart/form-data" class="article-form">
+      <h2>{% if article %}Edit Article{% else %}Create New Article{% endif %}</h2>
+    <form method="post" enctype="multipart/form-data" action="
+    {% if article %}
+        {% url 'create_article' %}?id={{ article.id }}&command=update
+    {% else %}
+        {% url 'create_article' %}?command=create
+    {% endif %}"
+    class="article-form">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group {% if field.field.widget.input_type == 'file' %}file-input-group{% endif %}">
